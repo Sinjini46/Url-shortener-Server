@@ -10,11 +10,13 @@ async function handlegeneratedurl(req, res) {
     redirectURL: body.url,
     visitHistory: [],
   });
-  return res.json({ id: shortID });
+  return res.json({ id: shortID, shortUrl: `${req.protocol}://${req.get('host')}/${shortID}` });
 }
 
 async function handlegetAnalytics(req, res) {
-  const shortid = req.params.shortid;
+  const fullUrl = req.params.shortUrl;
+  const urlObj = new URL(fullUrl);
+  const shortid = urlObj.pathname.slice(1); // Extract the shortid from the URL path
   const result = await URL.findOne({ shortid });
   if (!result) {
     return res.status(404).json({ error: "URL not found" });
